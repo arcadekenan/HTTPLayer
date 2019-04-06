@@ -12,6 +12,7 @@
 		A11872ED2257E26C002CD130 /* HTTPLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A11872DF2257E26B002CD130 /* HTTPLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A11872F92257E3B6002CD130 /* HTTPInit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11872F82257E3B6002CD130 /* HTTPInit.swift */; };
 		A11872FC2257F15C002CD130 /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11872FB2257F15C002CD130 /* HTTP.swift */; };
+		A11873042258516F002CD130 /* OSlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11873032258516F002CD130 /* OSlog.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,7 @@
 		A11872F82257E3B6002CD130 /* HTTPInit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPInit.swift; sourceTree = "<group>"; };
 		A11872FB2257F15C002CD130 /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTP.swift; sourceTree = "<group>"; };
 		A11872FF225800E5002CD130 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		A11873032258516F002CD130 /* OSlog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSlog.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +98,7 @@
 		A11872F62257E32D002CD130 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				A11873012258514D002CD130 /* Logger */,
 				A11872FA2257F148002CD130 /* Manager */,
 				A11872F72257E334002CD130 /* Configuration */,
 			);
@@ -116,6 +119,14 @@
 				A11872FB2257F15C002CD130 /* HTTP.swift */,
 			);
 			path = Manager;
+			sourceTree = "<group>";
+		};
+		A11873012258514D002CD130 /* Logger */ = {
+			isa = PBXGroup;
+			children = (
+				A11873032258516F002CD130 /* OSlog.swift */,
+			);
+			path = Logger;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -227,6 +238,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A11873042258516F002CD130 /* OSlog.swift in Sources */,
 				A11872F92257E3B6002CD130 /* HTTPInit.swift in Sources */,
 				A11872FC2257F15C002CD130 /* HTTP.swift in Sources */,
 			);
