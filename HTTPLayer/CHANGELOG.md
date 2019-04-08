@@ -6,5 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- GET requests with UrlParameters
+- GET requests with PathParameters
 - GET requests with QueryParameters
+- POST requests with ObjectParameter
+- PUT request with ObjectParameter

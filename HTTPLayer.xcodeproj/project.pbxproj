@@ -98,7 +98,7 @@
 		A11872F62257E32D002CD130 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				A11873012258514D002CD130 /* Logger */,
+				A11873012258514D002CD130 /* Extension */,
 				A11872FA2257F148002CD130 /* Manager */,
 				A11872F72257E334002CD130 /* Configuration */,
 			);
@@ -121,12 +121,12 @@
 			path = Manager;
 			sourceTree = "<group>";
 		};
-		A11873012258514D002CD130 /* Logger */ = {
+		A11873012258514D002CD130 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
 				A11873032258516F002CD130 /* OSlog.swift */,
 			);
-			path = Logger;
+			path = Extension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
