@@ -9,7 +9,7 @@
 import Foundation
 import os.log
 
-class HTTPManager {
+public class HTTPManager {
     
     private var config: HTTPInit
     public init(_ config: HTTPInit) {

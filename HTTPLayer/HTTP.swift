@@ -9,9 +9,8 @@
 import Foundation
 
 ///HTTP Network Manager
-class HTTP {
+public class HTTP {
  
     public static let config: HTTPInit = HTTPInit()
     public static let request: HTTPManager = HTTPManager(config)
-    
 }

@@ -14,6 +14,8 @@
 		A11872FC2257F15C002CD130 /* HTTPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11872FB2257F15C002CD130 /* HTTPManager.swift */; };
 		A11873042258516F002CD130 /* OSlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11873032258516F002CD130 /* OSlog.swift */; };
 		A129AD0322642A40001AE94F /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A129AD0222642A40001AE94F /* HTTP.swift */; };
+		A129AD052264305B001AE94F /* HTTPLayer.podspec in Resources */ = {isa = PBXBuildFile; fileRef = A129AD042264305B001AE94F /* HTTPLayer.podspec */; };
+		A129AD0722643087001AE94F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A129AD0622643087001AE94F /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +40,8 @@
 		A11872FF225800E5002CD130 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		A11873032258516F002CD130 /* OSlog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSlog.swift; sourceTree = "<group>"; };
 		A129AD0222642A40001AE94F /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTP.swift; sourceTree = "<group>"; };
+		A129AD042264305B001AE94F /* HTTPLayer.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HTTPLayer.podspec; sourceTree = SOURCE_ROOT; };
+		A129AD0622643087001AE94F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +89,8 @@
 				A129AD0222642A40001AE94F /* HTTP.swift */,
 				A11872E02257E26B002CD130 /* Info.plist */,
 				A11872FF225800E5002CD130 /* CHANGELOG.md */,
+				A129AD042264305B001AE94F /* HTTPLayer.podspec */,
+				A129AD0622643087001AE94F /* README.md */,
 			);
 			path = HTTPLayer;
 			sourceTree = "<group>";
@@ -224,6 +230,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A129AD0722643087001AE94F /* README.md in Resources */,
+				A129AD052264305B001AE94F /* HTTPLayer.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
