@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+
+## [0.0.2]
+### Added
+- Adding unified interface to access methods more easily
+
+## [0.0.1]
+### Added
 - GET requests with PathParameters
 - GET requests with QueryParameters
 - POST requests with ObjectParameter

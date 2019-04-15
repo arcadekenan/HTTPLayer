@@ -11,8 +11,9 @@
 		A11872EB2257E26C002CD130 /* HTTPLayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11872EA2257E26C002CD130 /* HTTPLayerTests.swift */; };
 		A11872ED2257E26C002CD130 /* HTTPLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A11872DF2257E26B002CD130 /* HTTPLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A11872F92257E3B6002CD130 /* HTTPInit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11872F82257E3B6002CD130 /* HTTPInit.swift */; };
-		A11872FC2257F15C002CD130 /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11872FB2257F15C002CD130 /* HTTP.swift */; };
+		A11872FC2257F15C002CD130 /* HTTPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11872FB2257F15C002CD130 /* HTTPManager.swift */; };
 		A11873042258516F002CD130 /* OSlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11873032258516F002CD130 /* OSlog.swift */; };
+		A129AD0322642A40001AE94F /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A129AD0222642A40001AE94F /* HTTP.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,9 +34,10 @@
 		A11872EA2257E26C002CD130 /* HTTPLayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPLayerTests.swift; sourceTree = "<group>"; };
 		A11872EC2257E26C002CD130 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A11872F82257E3B6002CD130 /* HTTPInit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPInit.swift; sourceTree = "<group>"; };
-		A11872FB2257F15C002CD130 /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTP.swift; sourceTree = "<group>"; };
+		A11872FB2257F15C002CD130 /* HTTPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPManager.swift; sourceTree = "<group>"; };
 		A11872FF225800E5002CD130 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		A11873032258516F002CD130 /* OSlog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSlog.swift; sourceTree = "<group>"; };
+		A129AD0222642A40001AE94F /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTP.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 			children = (
 				A11872F62257E32D002CD130 /* Source */,
 				A11872DF2257E26B002CD130 /* HTTPLayer.h */,
+				A129AD0222642A40001AE94F /* HTTP.swift */,
 				A11872E02257E26B002CD130 /* Info.plist */,
 				A11872FF225800E5002CD130 /* CHANGELOG.md */,
 			);
@@ -116,7 +119,7 @@
 		A11872FA2257F148002CD130 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
-				A11872FB2257F15C002CD130 /* HTTP.swift */,
+				A11872FB2257F15C002CD130 /* HTTPManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -239,8 +242,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A11873042258516F002CD130 /* OSlog.swift in Sources */,
+				A129AD0322642A40001AE94F /* HTTP.swift in Sources */,
 				A11872F92257E3B6002CD130 /* HTTPInit.swift in Sources */,
-				A11872FC2257F15C002CD130 /* HTTP.swift in Sources */,
+				A11872FC2257F15C002CD130 /* HTTPManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

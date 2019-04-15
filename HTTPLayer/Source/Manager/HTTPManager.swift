@@ -1,5 +1,5 @@
 //
-//  HTTP.swift
+//  HTTPManager.swift
 //  HTTPLayer
 //
 //  Created by Davi Bispo on 05/04/19.
@@ -9,13 +9,18 @@
 import Foundation
 import os.log
 
-class HTTP {
+class HTTPManager {
     
-    private static func buildUrl(usingHost host: String, context: String, andService service: String) -> URL? {
+    private var config: HTTPInit
+    public init(_ config: HTTPInit) {
+        self.config = config
+    }
+    
+    fileprivate func buildUrl(usingHost host: String, context: String, andService service: String) -> URL? {
         return URL(string: "\(host)\(context)\(service)")
     }
     
-    private static func buildUrl(usingHost host: String, context: String, service: String, withQueryParameters parameters: [String : String]?) -> URL? {
+    fileprivate func buildUrl(usingHost host: String, context: String, service: String, withQueryParameters parameters: [String : String]?) -> URL? {
         var base: String = "\(host)\(context)\(service)?"
         guard let parameters = parameters else { return URL(string: base) }
         base = "\(base)?"
@@ -23,7 +28,7 @@ class HTTP {
         return URL(string: base)
     }
     
-    private static func buildUrl(usingHost host: String, context: String, service: String, withPathParameters parameters: [String]?) -> URL? {
+    fileprivate func buildUrl(usingHost host: String, context: String, service: String, withPathParameters parameters: [String]?) -> URL? {
         var base: String = "\(host)\(context)\(service)"
         guard let parameters = parameters else { return URL(string: base) }
         base = "\(base)/"
@@ -32,12 +37,12 @@ class HTTP {
     }
     
     ///GET Type Request using Query Parameters and expecting JSON as the response.
-    public static func get<T>(from service: String, usingQueryParameters parameters: [String : String], fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
-        guard let hostAndContext = HTTPInit.data.getHostAndContext(withKey: hostAndContextKey) else {
+    public func get<T>(from service: String, usingQueryParameters parameters: [String : String], fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
+        guard let hostAndContext = config.getHostAndContext(withKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Suplied", log: OSLog.HTTPLayer, type: .debug)
             return
         }
-        guard let headers = HTTPInit.data.getHttpHeaders(withKey: headersKey) else { return }
+        guard let headers = config.getHeaders(withKey: headersKey) else { return }
         guard let url = buildUrl(usingHost: hostAndContext.host, context: hostAndContext.context, service: service, withQueryParameters: parameters) else { return }
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -56,12 +61,12 @@ class HTTP {
     }
     
     ///GET Type Request using URL Parameters and expecting JSON as the response.
-    public static func get<T>(from service: String, usingPathParameters parameters: [String], fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
-        guard let hostAndContext = HTTPInit.data.getHostAndContext(withKey: hostAndContextKey) else {
+    public func get<T>(from service: String, usingPathParameters parameters: [String], fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
+        guard let hostAndContext = config.getHostAndContext(withKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Suplied", log: OSLog.HTTPLayer, type: .debug)
             return
         }
-        guard let headers = HTTPInit.data.getHttpHeaders(withKey: headersKey) else { return }
+        guard let headers = config.getHeaders(withKey: headersKey) else { return }
         guard let url = buildUrl(usingHost: hostAndContext.host, context: hostAndContext.context, service: service, withPathParameters: parameters) else { return }
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -80,12 +85,12 @@ class HTTP {
     }
     
     ///POST Type Request using Body Object and expecting JSON as the response.
-    public static func post<T>(to service: String, withBody body: Any?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
-        guard let hostAndContext = HTTPInit.data.getHostAndContext(withKey: hostAndContextKey) else {
+    public func post<T>(to service: String, withBody body: Any?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
+        guard let hostAndContext = config.getHostAndContext(withKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Suplied", log: OSLog.HTTPLayer, type: .debug)
             return
         }
-        guard let headers = HTTPInit.data.getHttpHeaders(withKey: headersKey) else { return }
+        guard let headers = config.getHeaders(withKey: headersKey) else { return }
         guard let url = buildUrl(usingHost: hostAndContext.host, context: hostAndContext.context, andService: service) else { return }
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -110,12 +115,12 @@ class HTTP {
     }
     
     ///PUT Type Request using Body Object and/or Query Parameters and expecting JSON as the response.
-    public static func put<T>(on service: String, withBody body: Any?, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
-        guard let hostAndContext = HTTPInit.data.getHostAndContext(withKey: hostAndContextKey) else {
+    public func put<T>(on service: String, withBody body: Any?, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
+        guard let hostAndContext = config.getHostAndContext(withKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Suplied", log: OSLog.HTTPLayer, type: .debug)
             return
         }
-        guard let headers = HTTPInit.data.getHttpHeaders(withKey: headersKey) else { return }
+        guard let headers = config.getHeaders(withKey: headersKey) else { return }
         guard let url = buildUrl(usingHost: hostAndContext.host, context: hostAndContext.context, service: service, withQueryParameters: parameters ?? nil) else { return }
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = "PUT"
@@ -140,12 +145,12 @@ class HTTP {
     }
     
     ///PUT Type Request using Body Object and/or Path Parameters and expecting JSON as the response.
-    public static func put<T>(on service: String, withBody body: Any?, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
-        guard let hostAndContext = HTTPInit.data.getHostAndContext(withKey: hostAndContextKey) else {
+    public func put<T>(on service: String, withBody body: Any?, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
+        guard let hostAndContext = config.getHostAndContext(withKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Suplied", log: OSLog.HTTPLayer, type: .debug)
             return
         }
-        guard let headers = HTTPInit.data.getHttpHeaders(withKey: headersKey) else { return }
+        guard let headers = config.getHeaders(withKey: headersKey) else { return }
         guard let url = buildUrl(usingHost: hostAndContext.host, context: hostAndContext.context, service: service, withPathParameters: parameters ?? nil) else { return }
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = "PUT"
@@ -170,12 +175,12 @@ class HTTP {
     }
     
     ///DELETE Type Request using Body Object and/or Query Parameters and expecting JSON as the response.
-    public static func delete<T>(from service: String, withBody body: Any?, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
-        guard let hostAndContext = HTTPInit.data.getHostAndContext(withKey: hostAndContextKey) else {
+    public func delete<T>(from service: String, withBody body: Any?, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
+        guard let hostAndContext = config.getHostAndContext(withKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Suplied", log: OSLog.HTTPLayer, type: .debug)
             return
         }
-        guard let headers = HTTPInit.data.getHttpHeaders(withKey: headersKey) else { return }
+        guard let headers = config.getHeaders(withKey: headersKey) else { return }
         guard let url = buildUrl(usingHost: hostAndContext.host, context: hostAndContext.context, service: service, withQueryParameters: parameters ?? nil) else { return }
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = "DELETE"
@@ -200,12 +205,12 @@ class HTTP {
     }
     
     ///DELETE Type Request using Body Object and/or Path Parameters and expecting JSON as the response.
-    public static func delete<T>(from service: String, withBody body: Any?, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
-        guard let hostAndContext = HTTPInit.data.getHostAndContext(withKey: hostAndContextKey) else {
+    public func delete<T>(from service: String, withBody body: Any?, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String, receiving responseObj: T.Type!, completion: @escaping (Result<T, Error>) -> ()) where T : Codable {
+        guard let hostAndContext = config.getHostAndContext(withKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Suplied", log: OSLog.HTTPLayer, type: .debug)
             return
         }
-        guard let headers = HTTPInit.data.getHttpHeaders(withKey: headersKey) else { return }
+        guard let headers = HTTPInit().getHeaders(withKey: headersKey) else { return }
         guard let url = buildUrl(usingHost: hostAndContext.host, context: hostAndContext.context, service: service, withPathParameters: parameters ?? nil) else { return }
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = "DELETE"
