@@ -1,7 +1,7 @@
 # HTTPLayer
 Straight to the Point HTTP Networking for JSON Services in Swift
 
-[Platform](https://img.shields.io/cocoapods/p/HTTPLayer.svg)
+![Platform](https://img.shields.io/cocoapods/p/HTTPLayer.svg)
 
 - [Features](#features)
 - [Requirements](#requirements)
@@ -20,10 +20,10 @@ Straight to the Point HTTP Networking for JSON Services in Swift
 - [x] POST Method with JSON Body
 - [x] PUT Methods with JSON Body and/or Query and Path Parameters
 - [x] DELETE Methods with JSON Body and/or Query and Path Parameters
-- [] OPTION, HEAD, TRACE, CONNECT and PATCH methods
-- [] HTTP Response Validation
-- [] TLS Certificate and Public Key Pinning
-- [] Unit and Integration Test Coverage
+- [ ] OPTION, HEAD, TRACE, CONNECT and PATCH methods
+- [ ] HTTP Response Validation
+- [ ] TLS Certificate and Public Key Pinning
+- [ ] Unit and Integration Test Coverage
 
 ## Requirements
 
