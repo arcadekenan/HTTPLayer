@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os.log
 
 public class HTTPInit {
     
@@ -22,6 +23,27 @@ public class HTTPInit {
     ///Add a Header with its Key and Value to a Key to be used by the Request Methods
     public func add(header: (key: String, value: String), onKey: String) {
         self.keyToHeaders[onKey]?.append((header.key, header.value))
+    }
+    
+    ///Set one Host and Context from the List for each respective Key provided to be accessed by the Request Methods. List of Hosts and Contexts and Keys must have the same length.
+    public func set(listOfHostsAndContexts list: [( host: String, context: String )], onRespectiveKeys keys: [String]) {
+        if list.count == keys.count {
+            var index = 0
+            list.forEach {
+                self.keyToHostAndContext[keys[index]] = ($0.host, $0.context)
+                index += 1
+            }
+        } else {
+            os_log("Enable to set list of Hosts and Contexts: List and Keys differs in length", log: OSLog.HTTPLayer, type: .debug)
+            return
+        }
+    }
+    
+    ///Set a List of Headers on the Key provided to be used on Request Methods
+    public func set(listOfHeaders headers: [(key: String, value: String)], onKey: String) {
+        headers.forEach {
+            self.keyToHeaders[onKey]?.append(($0.key, $0.value))
+        }
     }
     
     ///Get the Host and Context already setted by its respective Key
