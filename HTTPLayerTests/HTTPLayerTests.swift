@@ -14,6 +14,8 @@ class HTTPLayerTests: XCTestCase {
     override func setUp() {
         HTTP.Config.add(host: "https://jsonplaceholder.typicode.com", withContext: "", onKey: "DEFAULT")
         HTTP.Config.add(header: (key: "Content-type", value: "application/json; charset=UTF-8"), onKey: "DEFAULT")
+        HTTP.Config.add(header: (key: "Content", value: "application/json; charset=UTF-8"), onKey: "DEFAULT")
+
     }
 
     override func tearDown() {

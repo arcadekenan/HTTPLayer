@@ -12,7 +12,7 @@ import os.log
 class HTTPInit {
     
     private var keyToHostAndContext: [ String : ( host: String, context: String ) ] = [:]
-    private var keyToHeaders: [ String : [( key: String, value: String )] ] = [:]
+    private var keyToHeaders: [ String : [ String : String ] ] = [:]
     public init() {}
 
     public func add(host: String, withContext context: String, onKey: String) {
@@ -20,10 +20,10 @@ class HTTPInit {
     }
     
     public func add(header: (key: String, value: String), onKey: String) {
-        if var headerEntry = self.keyToHeaders[onKey] {
-            headerEntry.append((header.key, header.value))
+        if self.keyToHeaders[onKey] != nil {
+            self.keyToHeaders[onKey]?[header.key] = header.value
         } else {
-            self.keyToHeaders[onKey] = [(header.key, header.value)]
+            self.keyToHeaders[onKey] = [header.key : header.value]
         }
     }
     
@@ -40,17 +40,41 @@ class HTTPInit {
         }
     }
     
-    public func set(listOfHeaders headers: [(key: String, value: String)], onKey: String) {
-        headers.forEach {
-            self.keyToHeaders[onKey]?.append(($0.key, $0.value))
-        }
+    public func set(listOfHeaders headers: [String : String], onKey: String) {
+        self.keyToHeaders[onKey] = headers
     }
     
     public func getHostAndContext(forKey key: String) -> ( host: String, context: String )? {
         return self.keyToHostAndContext[key]
     }
     
-    public func getHeaders(forKey key: String) -> [( key: String, value: String )]? {
+    public func getHeaders(forKey key: String) -> [String : String]? {
         return self.keyToHeaders[key]
+    }
+    
+    public func change(headerValueTo value: String, fromHeaderKey headerKey: String, onKey key: String) {
+        if var headers = self.keyToHeaders[key] {
+            if headers[headerKey] != nil {
+                self.keyToHeaders[key]?[headerKey] = value
+                os_log("Header Changed", log: OSLog.HTTPLayer, type: .debug)
+            } else {
+                os_log("No HeaderKey Found", log: OSLog.HTTPLayer, type: .debug)
+            }
+        } else {
+            os_log("No Key Found", log: OSLog.HTTPLayer, type: .debug)
+        }
+    }
+    
+    public func remove(headerKey: String, onKey key: String) {
+        if var headers = self.keyToHeaders[key] {
+            if headers[headerKey] != nil {
+                self.keyToHeaders[key]?.removeValue(forKey: headerKey)
+                os_log("Header Removed", log: OSLog.HTTPLayer, type: .debug)
+            } else {
+                os_log("No HeaderKey Found", log: OSLog.HTTPLayer, type: .debug)
+            }
+        } else {
+            os_log("No Key Found", log: OSLog.HTTPLayer, type: .debug)
+        }
     }
 }

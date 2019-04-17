@@ -33,7 +33,7 @@ public class HTTP {
         }
         
         ///Set a List of Headers on the Key provided to be used on Request Methods
-        static func set(listOfHeaders: [(key: String, value: String)], onKey: String) {
+        static func set(listOfHeaders: [String : String], onKey: String) {
             HTTP.httpInit.set(listOfHeaders: listOfHeaders, onKey: onKey)
         }
         
@@ -43,9 +43,20 @@ public class HTTP {
         }
         
         ///Get the Headers already setted by its respective Key
-        static func getHeaders(forKey: String) -> [(key: String, value: String)]? {
+        static func getHeaders(forKey: String) -> [String : String]? {
             return HTTP.httpInit.getHeaders(forKey: forKey)
         }
+        
+        ///Change Header Value on the Headers Dictionary by its headerKey
+        static func change(headerValueTo value: String, fromHeaderKey headerKey: String, onKey key: String) {
+            HTTP.httpInit.change(headerValueTo: value, fromHeaderKey: headerKey, onKey: key)
+        }
+        
+        ///Remove Header from Headers Dictinary by its headerKey
+        static func remove(headerKey: String, onKey key: String) {
+            HTTP.httpInit.remove(headerKey: headerKey, onKey: key)
+        }
+
     }
     
     class Request {
