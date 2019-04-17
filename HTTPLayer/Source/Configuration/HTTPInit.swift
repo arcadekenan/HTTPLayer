@@ -22,7 +22,11 @@ public class HTTPInit {
     
     ///Add a Header with its Key and Value to a Key to be used by the Request Methods
     public func add(header: (key: String, value: String), onKey: String) {
-        self.keyToHeaders[onKey]?.append((header.key, header.value))
+        if var headerEntry = self.keyToHeaders[onKey] {
+            headerEntry.append((header.key, header.value))
+        } else {
+            self.keyToHeaders[onKey] = [(header.key, header.value)]
+        }
     }
     
     ///Set one Host and Context from the List for each respective Key provided to be accessed by the Request Methods. List of Hosts and Contexts and Keys must have the same length.
