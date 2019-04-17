@@ -15,12 +15,12 @@ Straight to the Point HTTP Networking for JSON Services in Swift
 
 - [x] Easily to use and read Request / Response Methods
 - [x] JSON Responses
-- [x] Setting Hosts, Contexts and Headers only once and use it by Key Strings
+- [x] Setting Hosts, Contexts and Headers only once and use it by a Key defined by you
 - [x] GET Methods with Query and Path Parameters
 - [x] POST Method with JSON Body
 - [x] PUT Methods with JSON Body and/or Query and Path Parameters
 - [x] DELETE Methods with JSON Body and/or Query and Path Parameters
-- [X ] Unit and Integration Test Coverage
+- [X] Unit and Integration Test Coverage
 - [ ] OPTION and PATCH methods
 - [ ] HTTP Response Validation
 - [ ] TLS Certificate and Public Key Pinning
