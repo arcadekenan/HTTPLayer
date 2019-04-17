@@ -20,10 +20,10 @@ Straight to the Point HTTP Networking for JSON Services in Swift
 - [x] POST Method with JSON Body
 - [x] PUT Methods with JSON Body and/or Query and Path Parameters
 - [x] DELETE Methods with JSON Body and/or Query and Path Parameters
-- [] OPTION and PATCH methods
-- [] HTTP Response Validation
-- [] TLS Certificate and Public Key Pinning
-- [] Unit and Integration Test Coverage
+- [X ] Unit and Integration Test Coverage
+- [ ] OPTION and PATCH methods
+- [ ] HTTP Response Validation
+- [ ] TLS Certificate and Public Key Pinning
 
 ## Requirements
 
@@ -51,25 +51,32 @@ $ pod install
 ## Usage
 ### Configuration
 
-On your AppDelegate file add:
-
+To use HTTPLayer you just need to add its import on any class you might want.
 ```
 import HTTPLayer
+```
+
+It is recommended to configure all your hosts, contexts and  headers on the AppDelegate file, like the example bellow:
+
+```
++ import HTTPLayer
 
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
-    HTTP.config.{Configure any Hosts, Contexts and Headers you might use throughout your application}
+    
+    + HTTP.Config.{Configure any Hosts, Contexts and Headers you might use throughout your application}
+    
     return true
 }
 ```
 
-On any class you might want, use the methods as bellow:
+To call any of the implemented request methods, just use it as bellow:
 
 ```
-HTTP.request.get(...)
-HTTP.request.post(...)
-HTTP.request.put(...)
-HTTP.request.delete(...)
+HTTP.Request.get(...)
+HTTP.Request.post(...)
+HTTP.Request.put(...)
+HTTP.Request.delete(...)
 ```
 
 ## Credits

@@ -8,6 +8,6 @@
 
 import Foundation
 
-struct DELETEWithBodyAndPathParametersResponse: Decodable {
+struct DELETEWithPathParametersResponse: Decodable {
     
 }
