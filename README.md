@@ -1,7 +1,7 @@
 # HTTPLayer
 Straight to the Point HTTP Networking for JSON Services in Swift
 
-[![Platform](https://img.shields.io/cocoapods/p/HTTPLayer.svg)
+![Platform](https://img.shields.io/cocoapods/p/HTTPLayer.svg)
 
 - [Features](#features)
 - [Requirements](#requirements)
