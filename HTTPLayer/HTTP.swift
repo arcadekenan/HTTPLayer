@@ -15,7 +15,7 @@ public class HTTP {
     private static let httpManager: HTTPManager = HTTPManager(httpInit)
     
     ///Set of Methods for Configuring Hosts, Contexts and Headers
-    class Config {
+    public class Config {
         
         ///Add a Host and its Context associeted with a Key to be accessed by the Request Methods
         static func add(host: String, withContext: String, onKey: String) {
@@ -59,7 +59,7 @@ public class HTTP {
 
     }
     
-    class Request {
+    public class Request {
         
         ///GET Type Request without any parameter and expecting JSON as the response.
         static func get<D: Decodable>(from service: String, withHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, Error>) -> ()) {
