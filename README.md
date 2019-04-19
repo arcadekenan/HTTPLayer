@@ -23,6 +23,7 @@ Straight to the Point HTTP Networking for JSON Services in Swift
 - [X] Unit and Integration Test Coverage
 - [ ] OPTION and PATCH methods
 - [ ] HTTP Response Validation
+- [ ] Custom Error Response
 - [ ] TLS Certificate and Public Key Pinning
 
 ## Requirements
