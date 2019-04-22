@@ -57,25 +57,59 @@ To use HTTPLayer you just need to add its import on any class you might want.
 import HTTPLayer
 ```
 
-It is recommended to configure all your hosts, contexts and  headers on the AppDelegate file, like the example bellow:
+It is recommended to configure all your hosts, contexts and headers on the AppDelegate file, like the example bellow:
 
+- Inside the " func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {} " add configuration like:
 ```swift
-+ import HTTPLayer
+//For adding Hosts and Context or Headers
+HTTP.Config.add
 
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // Override point for customization after application launch.
-    
-    + HTTP.Config.{Configure any Hosts, Contexts and Headers you might use throughout your application}
-    
-    return true
-}
+//For setting multiplus Hosts and Context or Headers at once
+HTTP.Config.set
+
+//For changing already added Headers
+HTTP.Config.change
+
+//For removing any Header that has already been added
+HTTP.Config.remove
+
 ```
 
-These are the already implemented methods that you can choose from.
+These are the already implemented methods that you can choose from. All of them are accessable through "HTTP.Request" and all of them are documented and avaliable on the Xcode Autocomplete Shortcut. (E and D stands for Generic Object that conforms to Encodable for E and Decodable for D)
+
 -  GET
 ```swift
-HTTP.Request.get(from: <#T##String#>, withHostAndContext: <#T##String#>, andHeaders: <#T##String?#>, receivingObjectType: <#T##Decodable.Protocol!#>, completion: <#T##(Result<Decodable, Error>) -> ()#>)
+//Without Parameters:
+HTTP.Request.get(from: String, withHostAndContext: String, andHeaders: String, receivingObjectType: D, completion: (Result<D, Error>) -> ())
 
+//Path Parameters:
+HTTP.Request.get(from: String, usingPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+
+//Query Parameters:
+HTTP.Request.get(from: String, usingQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+```
+
+- POST
+```swift
+HTTP.Request.post(to: String, withBody: Encodable, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+```
+
+- PUT
+```swift
+//Path Parameters:
+HTTP.Request.put(on: String, withBody: E, andPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+
+//Query Parameters:
+HTTP.Request.put(on: String, withBody: E, andQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+```
+
+- DELETE
+```swift
+//Path Parameters
+HTTP.Request.delete(from: String, withPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+
+//Query Parameters
+HTTP.Request.delete(from: String, withQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
 ```
 
 ## Credits
