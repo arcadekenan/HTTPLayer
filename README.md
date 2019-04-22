@@ -13,7 +13,7 @@ Straight to the Point HTTP Networking for JSON Services in Swift
 
 ## Features
 
-- [x] Easily to use and read Request / Response Methods
+- [x] Easy to use and read Request / Response Methods
 - [x] JSON Responses
 - [x] Setting Hosts, Contexts and Headers only once and use it by a Key defined by you
 - [x] GET Methods with Query and Path Parameters
@@ -53,13 +53,13 @@ $ pod install
 ### Configuration
 
 To use HTTPLayer you just need to add its import on any class you might want.
-```
+```swift
 import HTTPLayer
 ```
 
 It is recommended to configure all your hosts, contexts and  headers on the AppDelegate file, like the example bellow:
 
-```
+```swift
 + import HTTPLayer
 
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -71,13 +71,11 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 
-To call any of the implemented request methods, just use it as bellow:
+These are the already implemented methods that you can choose from.
+-  GET
+```swift
+HTTP.Request.get(from: <#T##String#>, withHostAndContext: <#T##String#>, andHeaders: <#T##String?#>, receivingObjectType: <#T##Decodable.Protocol!#>, completion: <#T##(Result<Decodable, Error>) -> ()#>)
 
-```
-HTTP.Request.get(...)
-HTTP.Request.post(...)
-HTTP.Request.put(...)
-HTTP.Request.delete(...)
 ```
 
 ## Credits
