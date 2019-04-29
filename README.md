@@ -13,7 +13,7 @@ Straight to the Point HTTP Networking for JSON Services in Swift
 
 ## Features
 
-- [x] Easily to use and read Request / Response Methods
+- [x] Easy to use and read Request / Response Methods
 - [x] JSON Responses
 - [x] Setting Hosts, Contexts and Headers only once and use it by a Key defined by you
 - [x] GET Methods with Query and Path Parameters
@@ -23,6 +23,7 @@ Straight to the Point HTTP Networking for JSON Services in Swift
 - [X] Unit and Integration Test Coverage
 - [ ] OPTION and PATCH methods
 - [ ] HTTP Response Validation
+- [ ] Custom Error Response
 - [ ] TLS Certificate and Public Key Pinning
 
 ## Requirements
@@ -52,31 +53,63 @@ $ pod install
 ### Configuration
 
 To use HTTPLayer you just need to add its import on any class you might want.
-```
+```swift
 import HTTPLayer
 ```
 
-It is recommended to configure all your hosts, contexts and  headers on the AppDelegate file, like the example bellow:
+It is recommended to configure all your hosts, contexts and headers on the AppDelegate file, like the example bellow:
+
+- Inside the " func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {} " add configuration like:
+```swift
+//For adding Hosts and Context or Headers
+HTTP.Config.add
+
+//For setting multiplus Hosts and Context or Headers at once
+HTTP.Config.set
+
+//For changing already added Headers
+HTTP.Config.change
+
+//For removing any Header that has already been added
+HTTP.Config.remove
 
 ```
-+ import HTTPLayer
 
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // Override point for customization after application launch.
-    
-    + HTTP.Config.{Configure any Hosts, Contexts and Headers you might use throughout your application}
-    
-    return true
-}
+These are the already implemented methods that you can choose from. All of them are accessable through "HTTP.Request" and all of them are documented and avaliable on the Xcode Autocomplete Shortcut. (E and D stands for Generic Object that conforms to Encodable for E and Decodable for D)
+
+-  GET
+```swift
+//Without Parameters:
+HTTP.Request.get(from: String, withHostAndContext: String, andHeaders: String, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+
+//Path Parameters:
+HTTP.Request.get(from: String, usingPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+
+//Query Parameters:
+HTTP.Request.get(from: String, usingQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
 ```
 
-To call any of the implemented request methods, just use it as bellow:
-
+- POST
+```swift
+HTTP.Request.post(to: String, withBody: Encodable, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
 ```
-HTTP.Request.get(...)
-HTTP.Request.post(...)
-HTTP.Request.put(...)
-HTTP.Request.delete(...)
+
+- PUT
+```swift
+//Path Parameters:
+HTTP.Request.put(on: String, withBody: E, andPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+
+//Query Parameters:
+HTTP.Request.put(on: String, withBody: E, andQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+```
+
+- DELETE
+```swift
+//Path Parameters
+HTTP.Request.delete(from: String, withPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+
+//Query Parameters
+HTTP.Request.delete(from: String, withQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
 ```
 
 ## Credits
