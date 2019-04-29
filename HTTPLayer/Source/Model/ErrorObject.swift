@@ -9,6 +9,6 @@
 import Foundation
 
 public struct ErrorObject<ER: Decodable>: Error {
-    let response: ER?
-    let error: Error?
+    public let response: ER?
+    public let error: Error?
 }
