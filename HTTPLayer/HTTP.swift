@@ -62,48 +62,83 @@ public class HTTP {
     public class Request {
         
         ///GET Type Request without any parameter and expecting JSON as the response.
-        public static func get<D: Decodable>(from service: String, withHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<EmptyObject>>) -> ()) {
-            HTTP.httpManager.get(from: service, withHostAndContext: hostAndContextKey, andHeaders: headersKey, receivingObjectType: responseObj, completion: completion)
+        public static func get<D: Decodable>(from service: String, withHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, completion: @escaping (Result<D, ErrorObject<EmptyObject>>) -> ()) {
+            HTTP.httpManager.get(from: service, withHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
         }
         
         ///GET Type Request without any parameter, receaving a possible Error Object and expecting JSON as the response.
-        public static func get<D: Decodable, ER: Decodable>(from service: String, withHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, receivingAsError errorObj: ER.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
-            HTTP.httpManager.get(from: service, withHostAndContext: hostAndContextKey, andHeaders: headersKey, receivingObjectType: responseObj, completion: completion)
+        public static func get<D: Decodable, ER: Decodable>(from service: String, withHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, receivingAsError errorObj: ER.Type, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+            HTTP.httpManager.get(from: service, withHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
         }
         
         ///GET Type Request using Query Parameters and expecting JSON as the response.
-        public static func get<D: Decodable, ER: Decodable>(from service: String, usingQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
-            HTTP.httpManager.get(from: service, usingQueryParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, receivingObjectType: responseObj, completion: completion)
+        public static func get<D: Decodable>(from service: String, usingQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, completion: @escaping (Result<D, ErrorObject<EmptyObject>>) -> ()) {
+            HTTP.httpManager.get(from: service, usingQueryParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
+        }
+        
+        ///GET Type Request using Query Parameters, receaving a possible Error Object and expecting JSON as the response.
+        public static func get<D: Decodable, ER: Decodable>(from service: String, usingQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, receivingAsError errorObj: ER.Type, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+            HTTP.httpManager.get(from: service, usingQueryParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
         }
         
         ///GET Type Request using Path Parameters and expecting JSON as the response.
-        public static func get<D: Decodable, ER: Decodable>(from service: String, usingPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
-            HTTP.httpManager.get(from: service, usingPathParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, receivingObjectType: responseObj, completion: completion)
+        public static func get<D: Decodable>(from service: String, usingPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, completion: @escaping (Result<D, ErrorObject<EmptyObject>>) -> ()) {
+            HTTP.httpManager.get(from: service, usingPathParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
+        }
+        
+        ///GET Type Request using Path Parameters, receaving a possible Error Object and expecting JSON as the response.
+        public static func get<D: Decodable, ER: Decodable>(from service: String, usingPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, receivingAsError errorObj: ER.Type, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+            HTTP.httpManager.get(from: service, usingPathParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
         }
         
         ///POST Type Request using Body Object and expecting JSON as the response.
-        public static func post<E: Encodable, D: Decodable, ER: Decodable>(to service: String, withBody body: E, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
-            HTTP.httpManager.post(to: service, withBody: body, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, receivingObjectType: responseObj, completion: completion)
+        public static func post<E: Encodable, D: Decodable>(to service: String, withBody body: E, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, completion: @escaping (Result<D, ErrorObject<EmptyObject>>) -> ()) {
+            HTTP.httpManager.post(to: service, withBody: body, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
+        }
+        
+        ///POST Type Request using Body Object, receaving a possible Error Object and expecting JSON as the response.
+        public static func post<E: Encodable, D: Decodable, ER: Decodable>(to service: String, withBody body: E, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, receivingAsError errorObj: ER.Type, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+            HTTP.httpManager.post(to: service, withBody: body, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
         }
         
         ///PUT Type Request using Body Object and/or Query Parameters and expecting JSON as the response.
-        public static func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
-            HTTP.httpManager.put(on: service, withBody: body, andQueryParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, receivingObjectType: responseObj, completion: completion)
+        public static func put<E: Encodable, D: Decodable>(on service: String, withBody body: E, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, completion: @escaping (Result<D, ErrorObject<EmptyObject>>) -> ()) {
+            HTTP.httpManager.put(on: service, withBody: body, andQueryParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
+        }
+        
+        ///PUT Type Request using Body Object and/or Query Parameters, receaving a possible Error Object and expecting JSON as the response.
+        public static func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, receivingAsError errorObj: ER.Type, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+            HTTP.httpManager.put(on: service, withBody: body, andQueryParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
         }
         
         ///PUT Type Request using Body Object and/or Path Parameters and expecting JSON as the response.
-        public static func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
-            HTTP.httpManager.put(on: service, withBody: body, andPathParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, receivingObjectType: responseObj, completion: completion)
+        public static func put<E: Encodable, D: Decodable>(on service: String, withBody body: E, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, completion: @escaping (Result<D, ErrorObject<EmptyObject>>) -> ()) {
+            HTTP.httpManager.put(on: service, withBody: body, andPathParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
+        }
+        
+        ///PUT Type Request using Body Object and/or Path Parameters, receaving a possible Error Object and expecting JSON as the response.
+        public static func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, receivingAsError errorObj: ER.Type, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+            HTTP.httpManager.put(on: service, withBody: body, andPathParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
         }
         
         ///DELETE Type Request using Query Parameters and expecting JSON as the response.
-        public static func delete<D: Decodable, ER: Decodable>(from service: String, withQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
-            HTTP.httpManager.delete(from: service, withQueryParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, receivingObjectType: responseObj, completion: completion)
+        public static func delete<D: Decodable>(from service: String, withQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, completion: @escaping (Result<D, ErrorObject<EmptyObject>>) -> ()) {
+            HTTP.httpManager.delete(from: service, withQueryParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
+        }
+        
+        ///DELETE Type Request using Query Parameters, receaving a possible Error Object and expecting JSON as the response.
+        public static func delete<D: Decodable, ER: Decodable>(from service: String, withQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, receivingAsError errorObj: ER.Type, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+            HTTP.httpManager.delete(from: service, withQueryParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
         }
         
         ///DELETE Type Request using Path Parameters and expecting JSON as the response.
-        public static func delete<D: Decodable, ER: Decodable>(from service: String, withPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
-            HTTP.httpManager.delete(from: service, withPathParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, receivingObjectType: responseObj, completion: completion)
+        public static func delete<D: Decodable>(from service: String, withPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, completion: @escaping (Result<D, ErrorObject<EmptyObject>>) -> ()) {
+            HTTP.httpManager.delete(from: service, withPathParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
+        }
+        
+        ///DELETE Type Request using Path Parameters, receaving a possible Error Object and expecting JSON as the response.
+        public static func delete<D: Decodable, ER: Decodable>(from service: String, withPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type, receivingAsError errorObj: ER.Type, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+            HTTP.httpManager.delete(from: service, withPathParameters: parameters, fromHostAndContext: hostAndContextKey, andHeaders: headersKey, completion: completion)
         }
     }
 }

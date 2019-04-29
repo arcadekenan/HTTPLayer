@@ -20,10 +20,10 @@ Straight to the Point HTTP Networking for JSON Services in Swift
 - [x] POST Method with JSON Body
 - [x] PUT Methods with JSON Body and/or Query and Path Parameters
 - [x] DELETE Methods with JSON Body and/or Query and Path Parameters
-- [X] Unit and Integration Test Coverage
+- [X] Unit and Integration Test Coverage - (Need more test Coverage)
+- [X] HTTP Response Validation
+- [X] Custom Error Response Object
 - [ ] OPTION and PATCH methods
-- [ ] HTTP Response Validation
-- [ ] Custom Error Response
 - [ ] TLS Certificate and Public Key Pinning
 
 ## Requirements
@@ -77,39 +77,39 @@ HTTP.Config.remove
 
 These are the already implemented methods that you can choose from. All of them are accessable through "HTTP.Request" and all of them are documented and avaliable on the Xcode Autocomplete Shortcut. (E and D stands for Generic Object that conforms to Encodable for E and Decodable for D)
 
--  GET
+-  GET - (Add the parameter "receivingAsError: T.self" to use a custom Error Response Object)
 ```swift
 //Without Parameters:
-HTTP.Request.get(from: String, withHostAndContext: String, andHeaders: String, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+HTTP.Request.get(from: String, withHostAndContext: String, andHeaders: String, receivingObjectType: D.self, completion: (Result<D, Error>) -> ()) 
 
 //Path Parameters:
-HTTP.Request.get(from: String, usingPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+HTTP.Request.get(from: String, usingPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D.self, completion: (Result<D, Error>) -> ())
 
 //Query Parameters:
-HTTP.Request.get(from: String, usingQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+HTTP.Request.get(from: String, usingQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D.self, completion: (Result<D, Error>) -> ())
 ```
 
-- POST
+- POST - (Add the parameter "receivingAsError: T.self" to use a custom Error Response Object)
 ```swift
-HTTP.Request.post(to: String, withBody: Encodable, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+HTTP.Request.post(to: String, withBody: Encodable, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D.self, completion: (Result<D, Error>) -> ())
 ```
 
-- PUT
+- PUT - (Add the parameter "receivingAsError: T.self" to use a custom Error Response Object)
 ```swift
 //Path Parameters:
-HTTP.Request.put(on: String, withBody: E, andPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+HTTP.Request.put(on: String, withBody: E, andPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D.self, completion: (Result<D, Error>) -> ())
 
 //Query Parameters:
-HTTP.Request.put(on: String, withBody: E, andQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+HTTP.Request.put(on: String, withBody: E, andQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D.self, completion: (Result<D, Error>) -> ())
 ```
 
-- DELETE
+- DELETE - (Add the parameter "receivingAsError: T.self" to use a custom Error Response Object)
 ```swift
 //Path Parameters
-HTTP.Request.delete(from: String, withPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+HTTP.Request.delete(from: String, withPathParameters: [String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D.self, completion: (Result<D, Error>) -> ())
 
 //Query Parameters
-HTTP.Request.delete(from: String, withQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D, completion: (Result<D, Error>) -> ())
+HTTP.Request.delete(from: String, withQueryParameters: [String : String]?, fromHostAndContext: String, andHeaders: String?, receivingObjectType: D.self, completion: (Result<D, Error>) -> ())
 ```
 
 ## Credits

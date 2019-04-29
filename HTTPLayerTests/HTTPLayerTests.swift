@@ -16,6 +16,12 @@ class HTTPLayerTests: XCTestCase {
         HTTP.Config.add(header: (key: "Content-type", value: "application/json; charset=UTF-8"), onKey: "DEFAULT")
         HTTP.Config.add(header: (key: "Content", value: "application/json; charset=UTF-8"), onKey: "DEFAULT")
 
+        HTTP.Config.add(host: "http://192.168.3.225:8082", withContext: "/gf", onKey: "MF")
+        HTTP.Config.set(listOfHeaders: [
+            "Content-Type" : "application/json",
+            "Authorization" : "Bearer bW9iaWxlX2Nvb3BjZXJ0bzo=",
+            "user-key" : "4e8f5382d406e586d8c15246737a9ac9",
+        ], onKey: "MF")
     }
 
     override func tearDown() {
@@ -24,7 +30,7 @@ class HTTPLayerTests: XCTestCase {
 
     func testGetWithoutParameters() {
         let ex = expectation(description: "Expected server response, but naught was found")
-        HTTP.Request.get(from: "/posts", withHostAndContext: "DEFAULT", andHeaders: "DEFAULT", receivingObjectType: [GETWithoutParametersResponse].self, receivingAsError: GETWithQueryParametersResponse.self) { (response) in
+        HTTP.Request.get(from: "/posts", withHostAndContext: "DEFAULT", andHeaders: "DEFAULT", receivingObjectType: [GETWithoutParametersResponse].self) { (response) in
             switch response {
             case .success(let success):
                 XCTAssertNotNil(success)
@@ -42,7 +48,7 @@ class HTTPLayerTests: XCTestCase {
     
     func testGetWithQueryParameters() {
         let ex = expectation(description: "Expected server response, but naught was found")
-        
+
         HTTP.Request.get(from: "/comments", usingQueryParameters: [ "postId" : "1" ], fromHostAndContext: "DEFAULT", andHeaders: "DEFAULT", receivingObjectType: [GETWithQueryParametersResponse].self) { (response) in
             switch response {
             case .success(let success):
@@ -52,13 +58,13 @@ class HTTPLayerTests: XCTestCase {
             }
             ex.fulfill()
         }
-        
+
         waitForExpectations(timeout: 5) { (error) in
             guard let error = error else { return }
             XCTFail("Error: \(error.localizedDescription)")
         }
     }
-    
+
     func testGetWithPathParameters() {
         let ex = expectation(description: "Expected server response, but naught was found")
         HTTP.Request.get(from: "/posts", usingPathParameters: ["1", "comments"], fromHostAndContext: "DEFAULT", andHeaders: "DEFAULT", receivingObjectType: [GETWithPathParametersResponse].self) { (response) in
@@ -70,13 +76,13 @@ class HTTPLayerTests: XCTestCase {
             }
             ex.fulfill()
         }
-        
+
         waitForExpectations(timeout: 5) { (error) in
             guard let error = error else { return }
             XCTFail("Error: \(error.localizedDescription)")
         }
     }
-    
+
     func testPostWithBodyParameter() {
         let ex = expectation(description: "Expected server response, but naught was found")
         let body = POSTWithBodyParameterRequest(title: "foo", body: "bar", userId: 1)
@@ -89,13 +95,13 @@ class HTTPLayerTests: XCTestCase {
             }
             ex.fulfill()
         }
-        
+
         waitForExpectations(timeout: 5) { (error) in
             guard let error = error else { return }
             XCTFail("Error: \(error.localizedDescription)")
         }
     }
-    
+
     func testPutWithBodyAndPathParameters() {
         let ex = expectation(description: "Expected server response, but naught was found")
         let body = PUTWithBodyAndQueryParametersRequest(id: 1, title: "foo", body: "bar", userId: 1)
@@ -108,13 +114,13 @@ class HTTPLayerTests: XCTestCase {
             }
             ex.fulfill()
         }
-        
+
         waitForExpectations(timeout: 5) { (error) in
             guard let error = error else { return }
             XCTFail("Error: \(error.localizedDescription)")
         }
     }
-    
+
     func testDeleteWithBodyAndPathParameters() {
         let ex = expectation(description: "Expected server response, but naught was found")
         HTTP.Request.delete(from: "/posts", withPathParameters: ["1"], fromHostAndContext: "DEFAULT", andHeaders: "DEFAULT", receivingObjectType: DELETEWithPathParametersResponse.self) { (response) in
@@ -126,7 +132,7 @@ class HTTPLayerTests: XCTestCase {
             }
             ex.fulfill()
         }
-        
+
         waitForExpectations(timeout: 5) { (error) in
             guard let error = error else { return }
             XCTFail("Error: \(error.localizedDescription)")
