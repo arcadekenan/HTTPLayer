@@ -24,7 +24,7 @@ class HTTPLayerTests: XCTestCase {
 
     func testGetWithoutParameters() {
         let ex = expectation(description: "Expected server response, but naught was found")
-        HTTP.Request.get(from: "/posts", withHostAndContext: "DEFAULT", andHeaders: "DEFAULT", receivingObjectType: [GETWithoutParametersResponse].self) { (response) in
+        HTTP.Request.get(from: "/posts", withHostAndContext: "DEFAULT", andHeaders: "DEFAULT", receivingObjectType: [GETWithoutParametersResponse].self, receivingAsError: GETWithQueryParametersResponse.self) { (response) in
             switch response {
             case .success(let success):
                 XCTAssertNotNil(success)
@@ -42,6 +42,7 @@ class HTTPLayerTests: XCTestCase {
     
     func testGetWithQueryParameters() {
         let ex = expectation(description: "Expected server response, but naught was found")
+        
         HTTP.Request.get(from: "/comments", usingQueryParameters: [ "postId" : "1" ], fromHostAndContext: "DEFAULT", andHeaders: "DEFAULT", receivingObjectType: [GETWithQueryParametersResponse].self) { (response) in
             switch response {
             case .success(let success):

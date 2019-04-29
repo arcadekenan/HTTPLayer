@@ -1,5 +1,5 @@
 //
-//  HTTPInit.swift
+//  HTTPConfig.swift
 //  HTTPLayer
 //
 //  Created by Davi Bispo on 05/04/19.
@@ -9,7 +9,7 @@
 import Foundation
 import os.log
 
-class HTTPInit {
+class HTTPConfig{
     
     private var keyToHostAndContext: [ String : ( host: String, context: String ) ] = [:]
     private var keyToHeaders: [ String : [ String : String ] ] = [:]
@@ -77,4 +77,5 @@ class HTTPInit {
             os_log("No Key Found", log: OSLog.HTTPLayer, type: .debug)
         }
     }
+    
 }

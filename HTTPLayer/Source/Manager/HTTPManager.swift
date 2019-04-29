@@ -11,8 +11,8 @@ import os.log
 
 class HTTPManager {
     
-    private var config: HTTPInit
-    public init(_ config: HTTPInit) {
+    private var config: HTTPConfig
+    public init(_ config: HTTPConfig) {
         self.config = config
     }
     
@@ -21,6 +21,18 @@ class HTTPManager {
         case post = "POST"
         case put = "PUT"
         case delete = "DELETE"
+    }
+    
+    fileprivate func handle(HTTPStatusCode code: Int) -> (continue: Bool, message: String) {
+        let statusCodeMessage: HTTPStatusCodeMessages = HTTPStatusCodeMessages()
+        switch code {
+        case 100...199: return (continue: false, message: statusCodeMessage.getHTTPMessage(forCode: code))
+        case 200...299: return (continue: true, message: statusCodeMessage.getHTTPMessage(forCode: code))
+        case 300...399: return (continue: false, message: statusCodeMessage.getHTTPMessage(forCode: code))
+        case 400...499: return (continue: false, message: statusCodeMessage.getHTTPMessage(forCode: code))
+        case 500...599: return (continue: false, message: statusCodeMessage.getHTTPMessage(forCode: code))
+        default: return (continue: false, message: statusCodeMessage.getHTTPMessage(forCode: code))
+        }
     }
     
     fileprivate func buildUrl(usingHost host: String, context: String, andService service: String) -> URL? {
@@ -51,7 +63,7 @@ class HTTPManager {
         return URL(string: base)
     }
     
-    fileprivate func taskManager<D: Decodable>(usingUrl url: URL, httpMethod: HttpMethod, headersKey: String?, completion: @escaping (Result<D, Error>) -> ()) {
+    fileprivate func taskManager<D: Decodable, ER: Decodable>(usingUrl url: URL, httpMethod: HttpMethod, headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = httpMethod.rawValue
         if let keyVerified = headersKey, let headers = config.getHeaders(forKey: keyVerified) {
@@ -60,19 +72,31 @@ class HTTPManager {
             os_log("No Headers Setted or Found by the Key Provided", log: OSLog.HTTPLayer, type: .debug)
         }
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard let data = data else { completion(.failure(error!)); return }
-            do {
-                let responseObj = try JSONDecoder().decode(D.self, from: data)
-                completion(.success(responseObj))
-            }  catch  {
-                os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
-                completion(.failure(error))
+            guard let data = data else { completion(.failure(ErrorObject(response: nil, error: error!))); return }
+            let httpCodeValidation = self.handle(HTTPStatusCode: (response as! HTTPURLResponse).statusCode)
+            os_log("Status Code: %d - %s", (response as! HTTPURLResponse).statusCode, httpCodeValidation.message)
+            if httpCodeValidation.continue {
+                do {
+                    let responseObj = try JSONDecoder().decode(D.self, from: data)
+                    completion(.success(responseObj))
+                }  catch  {
+                    os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
+                    completion(.failure(ErrorObject(response: nil, error: error)))
+                }
+            } else {
+                do {
+                    let responseObj = try JSONDecoder().decode(ER.self, from: data)
+                    completion(.failure(ErrorObject(response: responseObj, error: error)))
+                }  catch  {
+                    os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
+                    completion(.failure(ErrorObject(response: nil, error: error)))
+                }
             }
         }
         task.resume()
     }
     
-    fileprivate func taskManager<E: Encodable, D: Decodable>(usingUrl url: URL, httpMethod: HttpMethod, headersKey: String?, bodyParameter: E, completion: @escaping (Result<D, Error>) -> ()) {
+    fileprivate func taskManager<E: Encodable, D: Decodable, ER: Decodable>(usingUrl url: URL, httpMethod: HttpMethod, headersKey: String?, bodyParameter: E, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = httpMethod.rawValue
         if let keyVerified = headersKey, let headers = config.getHeaders(forKey: keyVerified) {
@@ -87,19 +111,31 @@ class HTTPManager {
             return
         }
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard let data = data else { completion(.failure(error!)); return }
-            do {
-                let responseObj = try JSONDecoder().decode(D.self, from: data)
-                completion(.success(responseObj))
-            }  catch  {
-                os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
-                completion(.failure(error))
+            guard let data = data else { completion(.failure(ErrorObject(response: nil, error: error!))); return }
+            let httpCodeValidation = self.handle(HTTPStatusCode: (response as! HTTPURLResponse).statusCode)
+            os_log("Status Code: %d - %s", (response as! HTTPURLResponse).statusCode, httpCodeValidation.message)
+            if httpCodeValidation.continue {
+                do {
+                    let responseObj = try JSONDecoder().decode(D.self, from: data)
+                    completion(.success(responseObj))
+                }  catch  {
+                    os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
+                    completion(.failure(ErrorObject(response: nil, error: error)))
+                }
+            } else {
+                do {
+                    let responseObj = try JSONDecoder().decode(ER.self, from: data)
+                    completion(.failure(ErrorObject(response: responseObj, error: error)))
+                }  catch  {
+                    os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
+                    completion(.failure(ErrorObject(response: nil, error: error)))
+                }
             }
         }
         task.resume()
     }
     
-    public func get<D: Decodable>(from service: String, withHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, Error>) -> ()) {
+    public func get<D: Decodable, ER: Decodable>(from service: String, withHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -111,7 +147,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .get, headersKey: headersKey, completion: completion)
     }
     
-    public func get<D: Decodable>(from service: String, usingQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, Error>) -> ()) {
+    public func get<D: Decodable, ER: Decodable>(from service: String, usingQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -123,7 +159,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .get, headersKey: headersKey, completion: completion)
     }
     
-    public func get<D: Decodable>(from service: String, usingPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, Error>) -> ()) {
+    public func get<D: Decodable, ER: Decodable>(from service: String, usingPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -135,7 +171,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .get, headersKey: headersKey, completion: completion)
     }
     
-    public func post<E: Encodable, D: Decodable>(to service: String, withBody body: E, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, Error>) -> ()) {
+    public func post<E: Encodable, D: Decodable, ER: Decodable>(to service: String, withBody body: E, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -147,7 +183,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .post, headersKey: headersKey, bodyParameter: body, completion: completion)
     }
     
-    public func put<E: Encodable, D: Decodable>(on service: String, withBody body: E, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, Error>) -> ()) {
+    public func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -159,7 +195,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .put, headersKey: headersKey, bodyParameter: body, completion: completion)
     }
     
-    public func put<E: Encodable, D: Decodable>(on service: String, withBody body: E, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, Error>) -> ()) {
+    public func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -171,7 +207,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .put, headersKey: headersKey, bodyParameter: body, completion: completion)
     }
     
-    public func delete<D: Decodable>(from service: String, withQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, Error>) -> ()) {
+    public func delete<D: Decodable, ER: Decodable>(from service: String, withQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -183,7 +219,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .delete, headersKey: headersKey, completion: completion)
     }
     
-    public func delete<D: Decodable>(from service: String, withPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, Error>) -> ()) {
+    public func delete<D: Decodable, ER: Decodable>(from service: String, withPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, receivingObjectType responseObj: D.Type!, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
