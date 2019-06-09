@@ -13,6 +13,9 @@
 		A11872F92257E3B6002CD130 /* HTTPConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11872F82257E3B6002CD130 /* HTTPConfig.swift */; };
 		A11872FC2257F15C002CD130 /* HTTPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11872FB2257F15C002CD130 /* HTTPManager.swift */; };
 		A11873042258516F002CD130 /* OSlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11873032258516F002CD130 /* OSlog.swift */; };
+		A11D8AD622AAF2880080CE80 /* HTTPPinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11D8AD522AAF2880080CE80 /* HTTPPinner.swift */; };
+		A11D8AD822AB05490080CE80 /* HTTPSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11D8AD722AB05490080CE80 /* HTTPSecurity.swift */; };
+		A11D8ADA22AC8FCE0080CE80 /* ResponseObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11D8AD922AC8FCE0080CE80 /* ResponseObject.swift */; };
 		A129AD0322642A40001AE94F /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A129AD0222642A40001AE94F /* HTTP.swift */; };
 		A129AD052264305B001AE94F /* HTTPLayer.podspec in Resources */ = {isa = PBXBuildFile; fileRef = A129AD042264305B001AE94F /* HTTPLayer.podspec */; };
 		A129AD0722643087001AE94F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A129AD0622643087001AE94F /* README.md */; };
@@ -48,6 +51,9 @@
 		A11872FB2257F15C002CD130 /* HTTPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPManager.swift; sourceTree = "<group>"; };
 		A11872FF225800E5002CD130 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		A11873032258516F002CD130 /* OSlog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSlog.swift; sourceTree = "<group>"; };
+		A11D8AD522AAF2880080CE80 /* HTTPPinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPPinner.swift; sourceTree = "<group>"; };
+		A11D8AD722AB05490080CE80 /* HTTPSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPSecurity.swift; sourceTree = "<group>"; };
+		A11D8AD922AC8FCE0080CE80 /* ResponseObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseObject.swift; sourceTree = "<group>"; };
 		A129AD0222642A40001AE94F /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTP.swift; sourceTree = "<group>"; };
 		A129AD042264305B001AE94F /* HTTPLayer.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HTTPLayer.podspec; sourceTree = SOURCE_ROOT; };
 		A129AD0622643087001AE94F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
@@ -126,6 +132,7 @@
 		A11872F62257E32D002CD130 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				A11D8AD422AAF1FE0080CE80 /* Security */,
 				A16434EA2276A94D004A6623 /* Model */,
 				A1C447A422737218002E49C2 /* Message */,
 				A11873012258514D002CD130 /* Extension */,
@@ -157,6 +164,15 @@
 				A11873032258516F002CD130 /* OSlog.swift */,
 			);
 			path = Extension;
+			sourceTree = "<group>";
+		};
+		A11D8AD422AAF1FE0080CE80 /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				A11D8AD522AAF2880080CE80 /* HTTPPinner.swift */,
+				A11D8AD722AB05490080CE80 /* HTTPSecurity.swift */,
+			);
+			path = Security;
 			sourceTree = "<group>";
 		};
 		A129AD0822665F10001AE94F /* Response */ = {
@@ -193,6 +209,7 @@
 			children = (
 				A16434EB2276A962004A6623 /* ErrorObject.swift */,
 				A16434ED2276ACE7004A6623 /* EmptyObject.swift */,
+				A11D8AD922AC8FCE0080CE80 /* ResponseObject.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -320,9 +337,12 @@
 				A129AD0322642A40001AE94F /* HTTP.swift in Sources */,
 				A1C447A62273723C002E49C2 /* HTTPStatusCodeMessages.swift in Sources */,
 				A16434EE2276ACE7004A6623 /* EmptyObject.swift in Sources */,
+				A11D8AD822AB05490080CE80 /* HTTPSecurity.swift in Sources */,
 				A11872F92257E3B6002CD130 /* HTTPConfig.swift in Sources */,
 				A11872FC2257F15C002CD130 /* HTTPManager.swift in Sources */,
 				A16434EC2276A962004A6623 /* ErrorObject.swift in Sources */,
+				A11D8ADA22AC8FCE0080CE80 /* ResponseObject.swift in Sources */,
+				A11D8AD622AAF2880080CE80 /* HTTPPinner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

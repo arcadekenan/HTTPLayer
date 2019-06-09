@@ -15,13 +15,15 @@ class HTTPLayerTests: XCTestCase {
         HTTP.Config.add(host: "https://jsonplaceholder.typicode.com", withContext: "", onKey: "DEFAULT")
         HTTP.Config.add(header: (key: "Content-type", value: "application/json; charset=UTF-8"), onKey: "DEFAULT")
         HTTP.Config.add(header: (key: "Content", value: "application/json; charset=UTF-8"), onKey: "DEFAULT")
-
         HTTP.Config.add(host: "http://192.168.3.225:8082", withContext: "/gf", onKey: "MF")
         HTTP.Config.set(listOfHeaders: [
             "Content-Type" : "application/json",
             "Authorization" : "Bearer bW9iaWxlX2Nvb3BjZXJ0bzo=",
             "user-key" : "4e8f5382d406e586d8c15246737a9ac9",
         ], onKey: "MF")
+        
+        HTTP.Security.set(pinning: false)
+        HTTP.Security.set(continueWithoutPinning: false)
     }
 
     override func tearDown() {

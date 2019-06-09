@@ -9,11 +9,13 @@
 import Foundation
 import os.log
 
-class HTTPManager {
+class HTTPManager: NSObject, URLSessionDelegate {
     
     private var config: HTTPConfig
-    public init(_ config: HTTPConfig) {
+    private var security: HTTPSecurity
+    public init(_ config: HTTPConfig, _ security: HTTPSecurity) {
         self.config = config
+        self.security = security
     }
     
     enum HttpMethod: String {
@@ -21,6 +23,11 @@ class HTTPManager {
         case post = "POST"
         case put = "PUT"
         case delete = "DELETE"
+    }
+    
+    enum PinningResult {
+        case success
+        case failed
     }
     
     fileprivate func handle(HTTPStatusCode code: Int) -> (continue: Bool, message: String) {
@@ -63,7 +70,7 @@ class HTTPManager {
         return URL(string: base)
     }
     
-    fileprivate func taskManager<D: Decodable, ER: Decodable>(usingUrl url: URL, httpMethod: HttpMethod, headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    fileprivate func taskManager<D: Decodable, ER: Decodable>(usingUrl url: URL, httpMethod: HttpMethod, headersKey: String?, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = httpMethod.rawValue
         if let keyVerified = headersKey, let headers = config.getHeaders(forKey: keyVerified) {
@@ -71,14 +78,14 @@ class HTTPManager {
         } else {
             os_log("No Headers Setted or Found by the Key Provided", log: OSLog.HTTPLayer, type: .debug)
         }
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+        let task = URLSession(configuration: URLSessionConfiguration.ephemeral, delegate: self, delegateQueue: nil).dataTask(with: request) { (data, response, error) in
             guard let data = data else { completion(.failure(ErrorObject(response: nil, error: error!))); return }
             let httpCodeValidation = self.handle(HTTPStatusCode: (response as! HTTPURLResponse).statusCode)
             os_log("Status Code: %d - %s", (response as! HTTPURLResponse).statusCode, httpCodeValidation.message)
             if httpCodeValidation.continue {
                 do {
                     let responseObj = try JSONDecoder().decode(D.self, from: data)
-                    completion(.success(responseObj))
+                    completion(.success(ResponseObject(response: responseObj, headers: (response as! HTTPURLResponse).allHeaderFields)))
                 }  catch  {
                     os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
                     completion(.failure(ErrorObject(response: nil, error: error)))
@@ -100,7 +107,7 @@ class HTTPManager {
         task.resume()
     }
     
-    fileprivate func taskManager<E: Encodable, D: Decodable, ER: Decodable>(usingUrl url: URL, httpMethod: HttpMethod, headersKey: String?, bodyParameter: E, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    fileprivate func taskManager<E: Encodable, D: Decodable, ER: Decodable>(usingUrl url: URL, httpMethod: HttpMethod, headersKey: String?, bodyParameter: E, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         var request: URLRequest = URLRequest(url: url)
         request.httpMethod = httpMethod.rawValue
         if let keyVerified = headersKey, let headers = config.getHeaders(forKey: keyVerified) {
@@ -114,14 +121,14 @@ class HTTPManager {
             os_log("Unable to Serialize Body Object Provided", log: OSLog.HTTPLayer, type: .debug)
             return
         }
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+        let task = URLSession(configuration: URLSessionConfiguration.ephemeral, delegate: self, delegateQueue: nil).dataTask(with: request) { (data, response, error) in
             guard let data = data else { completion(.failure(ErrorObject(response: nil, error: error!))); return }
             let httpCodeValidation = self.handle(HTTPStatusCode: (response as! HTTPURLResponse).statusCode)
             os_log("Status Code: %d - %s", (response as! HTTPURLResponse).statusCode, httpCodeValidation.message)
             if httpCodeValidation.continue {
                 do {
                     let responseObj = try JSONDecoder().decode(D.self, from: data)
-                    completion(.success(responseObj))
+                    completion(.success(ResponseObject(response: responseObj, headers: (response as! HTTPURLResponse).allHeaderFields)))
                 }  catch  {
                     os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
                     completion(.failure(ErrorObject(response: nil, error: error)))
@@ -143,7 +150,97 @@ class HTTPManager {
         task.resume()
     }
     
-    public func get<D: Decodable, ER: Decodable>(from service: String, withHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    fileprivate func setupPinner(_ host: String, _ hashes: [String]) -> HTTPPinner {
+        let pinner = HTTPPinner(host, security)
+        hashes.forEach { hash in
+            pinner.addCertificateHash(hash)
+        }
+        
+        return pinner
+    }
+    
+    fileprivate func validate(pinner: HTTPPinner, trust: SecTrust, challenge: URLAuthenticationChallenge) -> (isTrustChainValid: Bool, trustPublicKeysResult: PinningResult){
+        
+        var isTrustChainValid = true
+        if (!pinner.validateCertificateTrustChain(trust)) {
+            os_log("Invalid Certificate Chain", log: OSLog.HTTPLayer, type: .debug)
+            isTrustChainValid = false
+        }
+        
+        if (pinner.validateTrustPublicKeys(trust)) {
+            return (isTrustChainValid, .success)
+        } else {
+            os_log("Pinning Activated: Being Challenged", log: OSLog.HTTPLayer, type: .debug)
+            print("couldn't validate trust for \(challenge.protectionSpace.host)")
+            return (isTrustChainValid, .failed)
+        }
+    }
+    
+    fileprivate func validate(certificateFile cert: Data, trust: SecTrust, challenge: URLAuthenticationChallenge) -> PinningResult {
+        let certificate =  SecTrustGetCertificateAtIndex(trust, 0)
+        let policies = NSMutableArray()
+        policies.add(SecPolicyCreateSSL(true, challenge.protectionSpace.host as CFString))
+        SecTrustSetPolicies(trust, policies)
+        var result:SecTrustResultType =  SecTrustResultType(rawValue: 0)!
+        SecTrustEvaluate(trust, &result)
+        let isServerTRusted: Bool = (result == SecTrustResultType.unspecified || result == SecTrustResultType.proceed)
+        let remoteCertificateData: NSData = SecCertificateCopyData(certificate!)
+        if(isServerTRusted && remoteCertificateData.isEqual(to: cert)){
+            return .success
+        }
+        else{
+            return .failed
+        }
+    }
+    
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        if security.getPinning() {
+            os_log("Pinning Activated: Being Challenged", log: OSLog.HTTPLayer, type: .debug)
+            guard let trust = challenge.protectionSpace.serverTrust else {
+                os_log("Invalid Server Trust", log: OSLog.HTTPLayer, type: .debug)
+                completionHandler(.cancelAuthenticationChallenge, nil)
+                return
+            }
+            let credential = URLCredential(trust: trust)
+            
+            if !security.getAllHashesToHost().isEmpty {
+                if let hash = security.getAllHashesToHost()[challenge.protectionSpace.host] {
+                    let validationResult = validate(pinner: setupPinner(challenge.protectionSpace.host, hash), trust: trust, challenge: challenge)
+                    if validationResult.isTrustChainValid {
+                        challenge.sender?.cancel(challenge)
+                    }
+                    if validationResult.trustPublicKeysResult == .success {
+                        os_log("Challenge Won", log: OSLog.HTTPLayer, type: .debug)
+                        completionHandler(.useCredential, credential)
+                    } else if validationResult.trustPublicKeysResult == .failed {
+                        os_log("Challenge Lost, couldn't validate Trust Public Keys", log: OSLog.HTTPLayer, type: .debug)
+                        completionHandler(.cancelAuthenticationChallenge, nil)
+                    }
+                }
+            } else if !security.getAllFileToHost().isEmpty {
+                if let data = security.getAllFileToHost()[challenge.protectionSpace.host], let cert = data {
+                    let validationResult = validate(certificateFile: cert, trust: trust, challenge: challenge)
+                    if validationResult == .success {
+                        os_log("Challenge Won", log: OSLog.HTTPLayer, type: .debug)
+                        completionHandler(.useCredential, credential)
+                    } else if validationResult == .failed {
+                        os_log("Challenge Lost, couldn't validate Trust Public Keys", log: OSLog.HTTPLayer, type: .debug)
+                        completionHandler(.cancelAuthenticationChallenge, nil)
+                    }
+                }
+            }
+            if security.getContinueWithoutPinning() {
+                os_log("Challenge Canceled, no host and/or certificates found but continuing as Default anyways", log: OSLog.HTTPLayer, type: .debug)
+                completionHandler(.performDefaultHandling, nil)
+            } else {
+                os_log("Challenge Canceled, no host and/or certificates found", log: OSLog.HTTPLayer, type: .debug)
+                completionHandler(.cancelAuthenticationChallenge, nil)
+            }
+        }
+        completionHandler(.performDefaultHandling, nil)
+    }
+    
+    public func get<D: Decodable, ER: Decodable>(from service: String, withHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -155,7 +252,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .get, headersKey: headersKey, completion: completion)
     }
     
-    public func get<D: Decodable, ER: Decodable>(from service: String, usingQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    public func get<D: Decodable, ER: Decodable>(from service: String, usingQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -167,7 +264,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .get, headersKey: headersKey, completion: completion)
     }
     
-    public func get<D: Decodable, ER: Decodable>(from service: String, usingPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    public func get<D: Decodable, ER: Decodable>(from service: String, usingPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -179,7 +276,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .get, headersKey: headersKey, completion: completion)
     }
     
-    public func post<E: Encodable, D: Decodable, ER: Decodable>(to service: String, withBody body: E, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    public func post<E: Encodable, D: Decodable, ER: Decodable>(to service: String, withBody body: E, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -191,7 +288,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .post, headersKey: headersKey, bodyParameter: body, completion: completion)
     }
     
-    public func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    public func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -203,7 +300,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .put, headersKey: headersKey, bodyParameter: body, completion: completion)
     }
     
-    public func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    public func put<E: Encodable, D: Decodable, ER: Decodable>(on service: String, withBody body: E, andPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -215,7 +312,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .put, headersKey: headersKey, bodyParameter: body, completion: completion)
     }
     
-    public func delete<D: Decodable, ER: Decodable>(from service: String, withQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    public func delete<D: Decodable, ER: Decodable>(from service: String, withQueryParameters parameters: [String : String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
@@ -227,7 +324,7 @@ class HTTPManager {
         taskManager(usingUrl: url, httpMethod: .delete, headersKey: headersKey, completion: completion)
     }
     
-    public func delete<D: Decodable, ER: Decodable>(from service: String, withPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<D, ErrorObject<ER>>) -> ()) {
+    public func delete<D: Decodable, ER: Decodable>(from service: String, withPathParameters parameters: [String]?, fromHostAndContext hostAndContextKey: String, andHeaders headersKey: String?, completion: @escaping (Result<ResponseObject<D>, ErrorObject<ER>>) -> ()) {
         guard let hostAndContext = config.getHostAndContext(forKey: hostAndContextKey) else {
             os_log("No Host and Context Found to the Key Provided", log: OSLog.HTTPLayer, type: .debug)
             return
