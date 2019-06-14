@@ -202,6 +202,7 @@ class HTTPManager: NSObject, URLSessionDelegate {
                 return
             }
             let credential = URLCredential(trust: trust)
+            var alternativeFlux = false
             
             if !security.getAllHashesToHost().isEmpty {
                 if let hash = security.getAllHashesToHost()[challenge.protectionSpace.host] {
@@ -216,8 +217,12 @@ class HTTPManager: NSObject, URLSessionDelegate {
                         os_log("Challenge Lost, couldn't validate Trust Public Keys", log: OSLog.HTTPLayer, type: .debug)
                         completionHandler(.cancelAuthenticationChallenge, nil)
                     }
+                } else {
+                    alternativeFlux = true
                 }
-            } else if !security.getAllFileToHost().isEmpty {
+            }
+            
+            if !security.getAllFileToHost().isEmpty {
                 if let data = security.getAllFileToHost()[challenge.protectionSpace.host], let cert = data {
                     let validationResult = validate(certificateFile: cert, trust: trust, challenge: challenge)
                     if validationResult == .success {
@@ -227,14 +232,19 @@ class HTTPManager: NSObject, URLSessionDelegate {
                         os_log("Challenge Lost, couldn't validate Trust Public Keys", log: OSLog.HTTPLayer, type: .debug)
                         completionHandler(.cancelAuthenticationChallenge, nil)
                     }
+                } else {
+                    alternativeFlux = true
                 }
             }
-            if security.getContinueWithoutPinning() {
-                os_log("Challenge Canceled, no host and/or certificates found but continuing as Default anyways", log: OSLog.HTTPLayer, type: .debug)
-                completionHandler(.performDefaultHandling, nil)
-            } else {
-                os_log("Challenge Canceled, no host and/or certificates found", log: OSLog.HTTPLayer, type: .debug)
-                completionHandler(.cancelAuthenticationChallenge, nil)
+            
+            if alternativeFlux {
+                if security.getContinueWithoutPinning() {
+                    os_log("Challenge Canceled, no host and/or certificates found but continuing as Default anyways", log: OSLog.HTTPLayer, type: .debug)
+                    completionHandler(.performDefaultHandling, nil)
+                } else {
+                    os_log("Challenge Canceled, no host and/or certificates found", log: OSLog.HTTPLayer, type: .debug)
+                    completionHandler(.cancelAuthenticationChallenge, nil)
+                }
             }
         }
         completionHandler(.performDefaultHandling, nil)
