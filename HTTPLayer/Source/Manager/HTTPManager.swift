@@ -79,7 +79,8 @@ class HTTPManager: NSObject, URLSessionDelegate {
             os_log("No Headers Setted or Found by the Key Provided", log: OSLog.HTTPLayer, type: .debug)
         }
         let task = URLSession(configuration: URLSessionConfiguration.ephemeral, delegate: self, delegateQueue: nil).dataTask(with: request) { (data, response, error) in
-            guard let data = data else { completion(.failure(ErrorObject(response: nil, error: error!))); return }
+            guard var data = data else { completion(.failure(ErrorObject(response: nil, error: error!))); return }
+            if data.count == 0 { data = "{}".data(using: .utf8)! }
             let httpCodeValidation = self.handle(HTTPStatusCode: (response as! HTTPURLResponse).statusCode)
             os_log("Status Code: %d - %s", (response as! HTTPURLResponse).statusCode, httpCodeValidation.message)
             if httpCodeValidation.continue {
@@ -122,7 +123,8 @@ class HTTPManager: NSObject, URLSessionDelegate {
             return
         }
         let task = URLSession(configuration: URLSessionConfiguration.ephemeral, delegate: self, delegateQueue: nil).dataTask(with: request) { (data, response, error) in
-            guard let data = data else { completion(.failure(ErrorObject(response: nil, error: error!))); return }
+            guard var data = data else { completion(.failure(ErrorObject(response: nil, error: error!))); return }
+            if data.count == 0 { data = "{}".data(using: .utf8)! }
             let httpCodeValidation = self.handle(HTTPStatusCode: (response as! HTTPURLResponse).statusCode)
             os_log("Status Code: %d - %s", (response as! HTTPURLResponse).statusCode, httpCodeValidation.message)
             if httpCodeValidation.continue {
