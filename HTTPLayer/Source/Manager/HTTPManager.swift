@@ -80,19 +80,13 @@ class HTTPManager: NSObject, URLSessionDelegate {
         }
         let task = URLSession(configuration: URLSessionConfiguration.ephemeral, delegate: self, delegateQueue: nil).dataTask(with: request) { (data, response, error) in
             guard var data = data else { completion(.failure(ErrorObject(response: nil, error: error!))); return }
+            if data.count == 0 { data = "{}".data(using: .utf8)! }
             let httpCodeValidation = self.handle(HTTPStatusCode: (response as! HTTPURLResponse).statusCode)
             os_log("Status Code: %d - %s", (response as! HTTPURLResponse).statusCode, httpCodeValidation.message)
             if httpCodeValidation.continue {
                 do {
-                    if data.count == 0 {
-                        let jsonEmptyResponse = "{}"
-                        let jsonData = Data(jsonEmptyResponse.utf8)
-                        let responseObj = try JSONDecoder().decode(D.self, from: jsonData)
-                        completion(.success(ResponseObject(response: responseObj, headers: (response as! HTTPURLResponse).allHeaderFields)))
-                    } else {
-                        let responseObj = try JSONDecoder().decode(D.self, from: data)
-                        completion(.success(ResponseObject(response: responseObj, headers: (response as! HTTPURLResponse).allHeaderFields)))
-                    }
+                    let responseObj = try JSONDecoder().decode(D.self, from: data)
+                    completion(.success(ResponseObject(response: responseObj, headers: (response as! HTTPURLResponse).allHeaderFields)))
                 }  catch  {
                     os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
                     completion(.failure(ErrorObject(response: nil, error: error)))
@@ -102,15 +96,6 @@ class HTTPManager: NSObject, URLSessionDelegate {
                     completion(.failure(ErrorObject(response: nil, error: error)))
                 } else {
                     do {
-                        if data.count == 0 {
-                            let jsonEmptyResponse = "{}"
-                            let jsonData = Data(jsonEmptyResponse.utf8)
-                            let responseObj = try JSONDecoder().decode(ER.self, from: jsonData)
-                            completion(.failure(ErrorObject(response: responseObj, error: error)))
-                        } else {
-                            let responseObj = try JSONDecoder().decode(ER.self, from: data)
-                            completion(.failure(ErrorObject(response: responseObj, error: error)))
-                        }
                         let responseObj = try JSONDecoder().decode(ER.self, from: data)
                         completion(.failure(ErrorObject(response: responseObj, error: error)))
                     }  catch  {
@@ -144,15 +129,6 @@ class HTTPManager: NSObject, URLSessionDelegate {
             os_log("Status Code: %d - %s", (response as! HTTPURLResponse).statusCode, httpCodeValidation.message)
             if httpCodeValidation.continue {
                 do {
-                    if data.count == 0 {
-                        let jsonEmptyResponse = "{}"
-                        let jsonData = Data(jsonEmptyResponse.utf8)
-                        let responseObj = try JSONDecoder().decode(D.self, from: jsonData)
-                        completion(.success(ResponseObject(response: responseObj, headers: (response as! HTTPURLResponse).allHeaderFields)))
-                    } else {
-                        let responseObj = try JSONDecoder().decode(D.self, from: data)
-                        completion(.success(ResponseObject(response: responseObj, headers: (response as! HTTPURLResponse).allHeaderFields)))
-                    }
                     let responseObj = try JSONDecoder().decode(D.self, from: data)
                     completion(.success(ResponseObject(response: responseObj, headers: (response as! HTTPURLResponse).allHeaderFields)))
                 }  catch  {
@@ -164,15 +140,8 @@ class HTTPManager: NSObject, URLSessionDelegate {
                     completion(.failure(ErrorObject(response: nil, error: error)))
                 } else {
                     do {
-                        if data.count == 0 {
-                            let jsonEmptyResponse = "{}"
-                            let jsonData = Data(jsonEmptyResponse.utf8)
-                            let responseObj = try JSONDecoder().decode(ER.self, from: jsonData)
-                            completion(.failure(ErrorObject(response: responseObj, error: error)))
-                        } else {
-                            let responseObj = try JSONDecoder().decode(ER.self, from: data)
-                            completion(.failure(ErrorObject(response: responseObj, error: error)))
-                        }
+                        let responseObj = try JSONDecoder().decode(ER.self, from: data)
+                        completion(.failure(ErrorObject(response: responseObj, error: error)))
                     }  catch  {
                         os_log("Unable to Parse Response to the Object Provided", log: OSLog.HTTPLayer, type: .debug)
                         completion(.failure(ErrorObject(response: nil, error: error)))
