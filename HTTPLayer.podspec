@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "HTTPLayer"
-  s.version      = "0.12.2"
+  s.version      = "0.12.3"
   s.summary      = "Straight to the Point HTTP Networking for JSON Services in Swift"
   s.swift_version = '5.0'
 
