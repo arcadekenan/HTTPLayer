@@ -55,7 +55,7 @@
 		A11D8AD722AB05490080CE80 /* HTTPSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPSecurity.swift; sourceTree = "<group>"; };
 		A11D8AD922AC8FCE0080CE80 /* ResponseObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponseObject.swift; sourceTree = "<group>"; };
 		A129AD0222642A40001AE94F /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTP.swift; sourceTree = "<group>"; };
-		A129AD042264305B001AE94F /* HTTPLayer.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HTTPLayer.podspec; sourceTree = SOURCE_ROOT; };
+		A129AD042264305B001AE94F /* HTTPLayer.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HTTPLayer.podspec; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		A129AD0622643087001AE94F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		A129AD0B22665F5A001AE94F /* GETResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GETResponse.swift; sourceTree = "<group>"; };
 		A129AD0D2266780E001AE94F /* POSTResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = POSTResponse.swift; sourceTree = "<group>"; };

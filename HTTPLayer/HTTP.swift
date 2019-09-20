@@ -96,6 +96,11 @@ public class HTTP {
             HTTP.httpSecurity.set(continueWithoutPinning: continueWithoutPinning)
         }
         
+        ///Enable or Disable Trust It All No Matter What Property. (Be mindful that, when enable, all trust store credentials won't be validated, therefor, no challenge will be made and all of them will be approved.)
+        public static func set(trustItAll: Bool) {
+            HTTP.httpSecurity.set(trustItAllNoMatterWhat: trustItAll)
+        }
+        
         ///Get Debug Mode status.
         public static func getDebugMode() -> Bool {
             return HTTP.httpSecurity.getDebugMode()
@@ -106,12 +111,12 @@ public class HTTP {
             return HTTP.httpSecurity.getPinning()
         }
         
-        ///Get all Hash Keys setted and its Hosts
+        ///Get all Hash Keys setted and its Hosts.
         public static func getAllHashesToHost() -> [String : [String]] {
             return HTTP.httpSecurity.getAllHashesToHost()
         }
         
-        ///Get all Certificate Files setted and its Hosts
+        ///Get all Certificate Files setted and its Hosts.
         public static func getAllFileToHost() -> [String : Data?] {
             return HTTP.httpSecurity.getAllFileToHost()
         }
@@ -119,6 +124,11 @@ public class HTTP {
         ///Get Continue Without Pinning status.
         public static func getContinueWithoutPinning() -> Bool {
             return HTTP.httpSecurity.getContinueWithoutPinning()
+        }
+        
+        ///Get Trust It All status.
+        public static func getTrustItAll() -> Bool {
+            return HTTP.httpSecurity.getTrustItAllNoMatterWhat()
         }
     }
     

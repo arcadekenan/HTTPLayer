@@ -48,6 +48,10 @@ class HTTPConfig{
         return self.keyToHostAndContext[key]
     }
     
+    public func getAllHostsAndContexts() -> [ String : ( host: String, context: String ) ] {
+        return self.keyToHostAndContext
+    }
+    
     public func getHeaders(forKey key: String) -> [String : String]? {
         return self.keyToHeaders[key]
     }

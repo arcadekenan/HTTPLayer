@@ -196,58 +196,71 @@ class HTTPManager: NSObject, URLSessionDelegate {
     }
     
     func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        if security.getPinning() {
-            os_log("Pinning Activated: Being Challenged", log: OSLog.HTTPLayer, type: .debug)
+        if security.getTrustItAllNoMatterWhat() {
+            os_log("TrustItAll Activated: BE CAREFUL!!! DON'T FORGET TO TURN IT OFF WHEN YOU ARE DONE WITH THE TESTING!", log: OSLog.HTTPLayer, type: .debug)
             guard let trust = challenge.protectionSpace.serverTrust else {
                 os_log("Invalid Server Trust", log: OSLog.HTTPLayer, type: .debug)
                 completionHandler(.cancelAuthenticationChallenge, nil)
                 return
             }
             let credential = URLCredential(trust: trust)
-            var alternativeFlux = false
-            
-            if !security.getAllHashesToHost().isEmpty {
-                if let hash = security.getAllHashesToHost()[challenge.protectionSpace.host] {
-                    let validationResult = validate(pinner: setupPinner(challenge.protectionSpace.host, hash), trust: trust, challenge: challenge)
-                    if validationResult.isTrustChainValid {
-                        challenge.sender?.cancel(challenge)
-                    }
-                    if validationResult.trustPublicKeysResult == .success {
-                        os_log("Challenge Won", log: OSLog.HTTPLayer, type: .debug)
-                        completionHandler(.useCredential, credential)
-                    } else if validationResult.trustPublicKeysResult == .failed {
-                        os_log("Challenge Lost, couldn't validate Trust Public Keys", log: OSLog.HTTPLayer, type: .debug)
-                        completionHandler(.cancelAuthenticationChallenge, nil)
-                    }
-                } else {
-                    alternativeFlux = true
-                }
-            }
-            
-            if !security.getAllFileToHost().isEmpty {
-                if let data = security.getAllFileToHost()[challenge.protectionSpace.host], let cert = data {
-                    let validationResult = validate(certificateFile: cert, trust: trust, challenge: challenge)
-                    if validationResult == .success {
-                        os_log("Challenge Won", log: OSLog.HTTPLayer, type: .debug)
-                        completionHandler(.useCredential, credential)
-                    } else if validationResult == .failed {
-                        os_log("Challenge Lost, couldn't validate Trust Public Keys", log: OSLog.HTTPLayer, type: .debug)
-                        completionHandler(.cancelAuthenticationChallenge, nil)
-                    }
-                } else {
-                    alternativeFlux = true
-                }
-            }
-            
-            if alternativeFlux {
-                if security.getContinueWithoutPinning() {
-                    os_log("Challenge Canceled, no host and/or certificates found but continuing as Default anyways", log: OSLog.HTTPLayer, type: .debug)
-                    completionHandler(.performDefaultHandling, nil)
-                } else {
-                    os_log("Challenge Canceled, no host and/or certificates found", log: OSLog.HTTPLayer, type: .debug)
+            completionHandler(.useCredential, credential)
+        } else {
+            if security.getPinning() {
+                os_log("Pinning Activated: Being Challenged", log: OSLog.HTTPLayer, type: .debug)
+                guard let trust = challenge.protectionSpace.serverTrust else {
+                    os_log("Invalid Server Trust", log: OSLog.HTTPLayer, type: .debug)
                     completionHandler(.cancelAuthenticationChallenge, nil)
+                    return
+                }
+                let credential = URLCredential(trust: trust)
+                var alternativeFlux = false
+                
+                if !security.getAllHashesToHost().isEmpty {
+                    if let hash = security.findHashs(byHost: challenge.protectionSpace.host, inHostsAndContexts: config.getAllHostsAndContexts()) {
+                        let validationResult = validate(pinner: setupPinner(challenge.protectionSpace.host, hash), trust: trust, challenge: challenge)
+                        if validationResult.isTrustChainValid {
+                            challenge.sender?.cancel(challenge)
+                        }
+                        if validationResult.trustPublicKeysResult == .success {
+                            os_log("Challenge Won", log: OSLog.HTTPLayer, type: .debug)
+                            completionHandler(.useCredential, credential)
+                        } else if validationResult.trustPublicKeysResult == .failed {
+                            os_log("Challenge Lost, couldn't validate Trust Public Keys", log: OSLog.HTTPLayer, type: .debug)
+                            completionHandler(.cancelAuthenticationChallenge, nil)
+                        }
+                    } else {
+                        alternativeFlux = true
+                    }
+                }
+                
+                if !security.getAllFileToHost().isEmpty {
+                    if let data = security.findFile(byHost: challenge.protectionSpace.host, inHostsAndContexts: config.getAllHostsAndContexts()), let cert = data {
+                        //                if let data = security.getAllFileToHost()[challenge.protectionSpace.host], let cert = data {
+                        let validationResult = validate(certificateFile: cert, trust: trust, challenge: challenge)
+                        if validationResult == .success {
+                            os_log("Challenge Won", log: OSLog.HTTPLayer, type: .debug)
+                            completionHandler(.useCredential, credential)
+                        } else if validationResult == .failed {
+                            os_log("Challenge Lost, couldn't validate Trust Public Keys", log: OSLog.HTTPLayer, type: .debug)
+                            completionHandler(.cancelAuthenticationChallenge, nil)
+                        }
+                    } else {
+                        alternativeFlux = true
+                    }
+                }
+                
+                if alternativeFlux {
+                    if security.getContinueWithoutPinning() {
+                        os_log("Challenge Canceled, no host and/or certificates found but continuing as Default anyways", log: OSLog.HTTPLayer, type: .debug)
+                        completionHandler(.performDefaultHandling, nil)
+                    } else {
+                        os_log("Challenge Canceled, no host and/or certificates found", log: OSLog.HTTPLayer, type: .debug)
+                        completionHandler(.cancelAuthenticationChallenge, nil)
+                    }
                 }
             }
+            completionHandler(.performDefaultHandling, nil)
         }
         completionHandler(.performDefaultHandling, nil)
     }
